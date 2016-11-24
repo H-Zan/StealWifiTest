@@ -26,7 +26,7 @@ import java.util.Locale;
  * 判断wifi是否链接,wifi链接且location!=null,就抓取,否则换为gps,gps等location改变时,记录位置发送???
  * 抓取地理位置:在应用开启期间只抓取一次: 有没有只调用一次的方法
  * gps-- location 有时会为null,还不知空旷地区是否第一次为null
- *
+ *         
  * 因为有时,或者第一次抓取的话,location有可能是null 这样position是没有数据的,这时不能发送
  * 但是在位置监听器里,只要调用,position就是有数据的,位置改变时会被多次调用 : (怎样让位置改变时只调用一次?)
  * 怎么等position有数据的时候再发送而且只发送一次?
@@ -36,7 +36,8 @@ import java.util.Locale;
  *
  * ===位置在打开期间只记录一次SharedPreference能否实现?
  * ===若location!=null,且有position时,即刻发送.
- * ===position为0.00,0.00的情况下:利用SharedPreference在oncreate中初始化,在位置回调时:如果值为初始值,记录并发送位置,改为已经发送的值;否则,不做任何事.
+ * ===position为0.00,0.00的情况下:
+ *            利用SharedPreference在oncreate中初始化,在位置回调时:如果值为初始值,记录并发送位置,改为已经发送的值;否则,不做任何事.
  *
  * Created by Zan on 2016/11/22.
  */
