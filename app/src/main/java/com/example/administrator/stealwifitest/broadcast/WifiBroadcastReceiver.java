@@ -37,8 +37,7 @@ import java.util.Locale;
  *
  * ===位置在打开期间只记录一次SharedPreference能否实现?        
  * ===若location!=null,且有position时,即刻发送.
- * ===position为0.00,0.00的情况下:
- *            利用SharedPreference在oncreate中初始化,在位置回调时:如果值为初始值,记录并发送位置,改为已经发送的值;否则,不做任何事.
+ * ===position为0.00,0.00的情况下:利用SharedPreference在oncreate中初始化,在位置回调时:如果值为初始值,记录并发送位置,改为已经发送的值;否则,不做任何事.
  *
  * Created by Zan on 2016/11/22.
  */
