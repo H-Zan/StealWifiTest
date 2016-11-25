@@ -24,6 +24,7 @@ public class PostService extends Service {
 
 	@Override
 	public void onCreate() {
+		this.getBaseContext();
 		L.e(TAG,"onCreate");
 		super.onCreate();
 	}

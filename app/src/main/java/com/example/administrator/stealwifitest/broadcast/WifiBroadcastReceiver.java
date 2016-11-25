@@ -17,6 +17,7 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.example.administrator.stealwifitest.Utils.L;
+import com.example.administrator.stealwifitest.Utils.persistance.SharePreferencePersistance;
 import com.example.administrator.stealwifitest.service.PostService;
 
 import java.util.ArrayList;
@@ -49,7 +50,8 @@ public class WifiBroadcastReceiver extends BroadcastReceiver {
 	private double latitude;
 	private double longitude;
 	private String provider;
-
+	private String LOCATION_KEY = "HasLocation";
+	
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		mContext = context;
@@ -236,28 +238,45 @@ public class WifiBroadcastReceiver extends BroadcastReceiver {
 		criteria.setAltitudeRequired(false);// 设置不需要获取海拔方向数据
 		criteria.setBearingRequired(false);// 设置不需要获取方位数据
 		criteria.setCostAllowed(true);// 设置允许产生资费
-		criteria.setPowerRequirement(Criteria.POWER_LOW);// 低功耗
-		criteria.setPowerRequirement(Criteria.POWER_HIGH);// 低功耗
+		criteria.setPowerRequirement(Criteria.POWER_LOW);//  低功耗  wifi
+//		criteria.setPowerRequirement(Criteria.POWER_HIGH);// 高功耗 gps
 
 		provider = mLocationManager.getBestProvider(criteria, true);// 获取GPS信息
 		L.e("location", "provider: location " + provider);
-		Toast.makeText(con, provider, Toast.LENGTH_SHORT).show();
+		Toast.makeText(con, provider+"1", Toast.LENGTH_SHORT).show();
 		if (provider != null) {
 			L.e("location", "provider != null");
 
 			Location location = mLocationManager.getLastKnownLocation(provider);// 通过GPS获取位置
 			if (location == null) {
-//				criteria.setPowerRequirement(Criteria.POWER_LOW);// 低功耗
-//				provider = mLocationManager.getBestProvider(criteria, true);// 获取GPS信息
-//				location = mLocationManager.getLastKnownLocation(provider);
-				L.e("location", "location == null");
-				L.e("location", "provider:" + provider);
+				criteria.setPowerRequirement(Criteria.POWER_LOW);// 低功耗  wifi
+				provider = mLocationManager.getBestProvider(criteria, true);// 获取GPS信息
+				if (provider != null) {
+					
+					location = mLocationManager.getLastKnownLocation(provider);
+					L.e("location", "location == null");
+					L.e("location", "provider:" + provider);
+					Toast.makeText(con, provider+"2", Toast.LENGTH_SHORT).show();
+				}
 			}
+			if (provider != null) {
+				if (location == null && provider.contains("network")) {  //没有wifi 情况下 变成gps
+					criteria.setPowerRequirement(Criteria.POWER_HIGH);// 高功耗  gps
+					provider = mLocationManager.getBestProvider(criteria, true);// 获取GPS信息
+					if (provider != null) {
+						location = mLocationManager.getLastKnownLocation(provider);
+						L.e("location", "location == null");
+						L.e("location", "provider:" + provider);
+						Toast.makeText(con, provider + "3", Toast.LENGTH_SHORT).show();
+					}
+				}
+			}
+			
 			updateUIToNewLocation(location);
 			L.e("location", location);
 			// 设置监听器，自动更新的最小时间为间隔N秒(这里的单位是微秒)或最小位移变化超过N米(这里的单位是米) 0.00001F
-
 			mLocationManager.requestLocationUpdates(provider, 1000, 1, locationListener);
+			
 		} else {
 			L.e("Please", "Add ACCESS_FINE_LOCATION Or ACCESS_COARSE_LOCATION Permission");
 		}
@@ -286,22 +305,31 @@ public class WifiBroadcastReceiver extends BroadcastReceiver {
 
 
 	}
-
+	
 	// 定义对位置变化的监听函数
 	LocationListener locationListener = new LocationListener() {
 		public void onLocationChanged(Location location) {
-
-			if (location != null) {
-
-				latitude = location.getLatitude();
-				longitude = location.getLongitude();
-
-				postion = latitude + "," + longitude;
-				Toast.makeText(mContext, postion, Toast.LENGTH_SHORT).show();
-				L.e("location", "onLocationChanged: " + "纬度：" + location.getLatitude() + "\n经度" + location.getLongitude());
-			} else {
-				postion = latitude + "," + longitude;
-				L.e("location","!!!!NO");
+			SharePreferencePersistance share = new SharePreferencePersistance();
+			String string = share.getString(mContext, LOCATION_KEY, "None");
+			
+			if (string.equals("HasLocation")) {
+				Toast.makeText(mContext,string+",doNothing", Toast.LENGTH_SHORT).show();
+				
+			}else{
+				Toast.makeText(mContext,string+"NoLocation", Toast.LENGTH_SHORT).show();
+				if (location != null) {
+					
+					latitude = location.getLatitude();
+					longitude = location.getLongitude();
+					
+					postion = latitude + "," + longitude;
+					Toast.makeText(mContext, postion, Toast.LENGTH_SHORT).show();
+					L.e("location", "onLocationChanged: " + "纬度：" + location.getLatitude() + "\n经度" + location.getLongitude());
+					share.putString(mContext,LOCATION_KEY,"HasLocation");
+				} else {
+					postion = latitude + "," + longitude;
+					L.e("location","!!!!NO");
+				}
 			}
 
 		}
