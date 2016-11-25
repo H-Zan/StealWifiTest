@@ -17,7 +17,7 @@ public class MainActivity extends AppCompatActivity {
 //		postion=MaiManager.getPostion();
 //		L.e("gps-已打开", postion);
 		
-		//保证打开之后有一次抓取位置
+		//保证打开之后有一次抓取位置   
 		SharePreferencePersistance sharePreferencePersistance = new SharePreferencePersistance();
 		sharePreferencePersistance.putString(this,"HasLocation","None");
 	}
