@@ -1,4 +1,4 @@
 /build
-### Your template template
 /src/test
-/src/androidTestgit
+/src/androidTest
+/src/debug
